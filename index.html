@@ -212,7 +212,7 @@
         </div>
       </div>
 
-      <button onclick="hantarTransaksiPinjaman()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md mt-4">
+      <button onclick="hantarTransaksiPinjaman(this)" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md mt-4">
         Hantar Rekod Pinjaman
       </button>
     </div>
@@ -679,16 +679,35 @@ function tangkapGambarFizikal(idVideo, idImgPreview, idZonVideo, idButangSnap) {
       });
     }
 
-    async function hantarTransaksiPinjaman() {
+    async function hantarTransaksiPinjaman(butangHantar) {
       const kodSekolah = document.getElementById('kod-sekolah-terpilih-pinjam').value;
       const namaPeminjam = document.getElementById('nama-peminjam').value.trim();
       const emelPeminjam = document.getElementById('emel-peminjam').value.trim(); 
       const tarikhJangkaPulang = document.getElementById('tarikh-pulang-pinjam').value;
+      
       if(!kodSekolah || !namaPeminjam || !emelPeminjam || troliImbasan.length === 0) {
-        paparNotifikasiPintar("🔒 Sila lengkapkan maklumat & imbas item!", "ralat"); return;
+        paparNotifikasiPintar("🔒 Sila lengkapkan maklumat & imbas item!", "ralat"); 
+        return;
       }
-      const payload = { action: "prosesPinjaman", kodSekolah, namaSekolah: dbSekolah.find(s=>s.kod===kodSekolah).nama, emelSekolah: dbSekolah.find(s=>s.kod===kodSekolah).emel, namaPeminjam, emelPeminjam, tarikhJangkaPulang, senaraiIdAset: troliImbasan, gambarB64: dataGambarB64 };
-      eksekusiHantarApi(payload, event ? event.target : null);
+      
+      const sekolahObj = dbSekolah.find(s => s.kod === kodSekolah);
+      const namaSekolah = sekolahObj ? sekolahObj.nama : "";
+      const emelSekolah = sekolahObj ? sekolahObj.emel : "";
+
+      const payload = { 
+        action: "prosesPinjaman", 
+        kodSekolah, 
+        namaSekolah, 
+        emelSekolah, 
+        namaPeminjam, 
+        emelPeminjam, 
+        tarikhJangkaPulang, 
+        senaraiIdAset: troliImbasan, 
+        gambarB64: dataGambarB64 
+      };
+      
+      // Menggunakan butangHantar yang dihantar dari HTML dengan selamat tanpa ralat 'event'
+      eksekusiHantarApi(payload, butangHantar || null);
     }
 
     async function hantarTransaksiPemulangan() {
